@@ -5,11 +5,12 @@ require 'fileutils'
 
 module Ktsh
   class Meta
-    attr_reader :video_path, :samples, :duration, :size, :resolution, :tmpdir
+    attr_reader :video_path, :samples, :width, :duration, :size, :resolution, :tmpdir
 
-    def initialize(video_path, samples)
+    def initialize(video_path, samples, width)
       @video_path = video_path
       @samples = samples
+      @width = width
       @tmpdir = FileUtils.mkdir_p(File.join(Dir.tmpdir, 'ktsh', SecureRandom.uuid))[0]
 
       probe_video
@@ -47,7 +48,7 @@ module Ktsh
         time_point_str = human_time(time_point)
         thumbnail_path = File.join(tmpdir, "#{seq}.jpg")
 
-        command = %Q{ffmpeg -ss #{time_point} -i "#{@video_path}" -vf "scale=640:-1,drawtext=text='#{time_point_str}':fontcolor=white:fontsize=12:shadowcolor=black@0.7:shadowx=2:shadowy=2:x=w-tw-10:y=h-th-10" -vframes 1 -q:v 2 "#{thumbnail_path}" 2>/dev/null}
+        command = %Q{ffmpeg -ss #{time_point} -i "#{@video_path}" -vf "scale=#{width}:-1,drawtext=text='#{time_point_str}':fontcolor=white:fontsize=12:shadowcolor=black@0.7:shadowx=2:shadowy=2:x=w-tw-10:y=h-th-10" -vframes 1 -q:v 2 "#{thumbnail_path}" 2>/dev/null}
         system(command)
       end
     end
@@ -65,9 +66,10 @@ module Ktsh
   end
 
   class << self
-    def create(video, horizontal: 8, vertical: 6)
-      meta = Meta.new(video, horizontal * vertical)
-      command = %Q{ffmpeg -pattern_type glob -i "#{meta.tmpdir}/*.jpg" -filter_complex "scale=380:-1,tile=#{horizontal}x#{vertical}:padding=3:color=white,pad=iw+4:ih+102:2:100:white,drawtext=textfile='#{meta.info_file}':fontsize=18:fontcolor=black:x=2:y=2,format=yuv420p" -q:v 2 #{video}.jpg}
+    def create(video, horizontal: 8, vertical: 6, width: 2560, padding: 2)
+      sample_width = (width - ((horizontal - 1) * padding) - 4) / horizontal
+      meta = Meta.new(video, horizontal * vertical, sample_width)
+      command = %Q{ffmpeg -pattern_type glob -i "#{meta.tmpdir}/*.jpg" -filter_complex "tile=#{horizontal}x#{vertical}:padding=#{padding}:color=white,pad=iw+4:ih+102:2:100:white,drawtext=textfile='#{meta.info_file}':fontsize=18:fontcolor=black:x=2:y=2,format=yuv420p" -q:v 2 #{video}.jpg}
       system(command)
     end
   end
