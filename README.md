@@ -1,11 +1,11 @@
-# ktsh.rb
+# ktsh
 
-A Ruby script that generates a video contact sheet by extracting evenly-spaced frames from a video file and compositing them into a tiled grid image.
+Generates a video contact sheet by extracting evenly-spaced frames from a video file and compositing them into a tiled grid image.
 
 ## Usage
 
 ```bash
-ruby ktsh.rb [options] <video_file>
+ktsh [options] <video-or-dir>
 ```
 
 ### Options
@@ -18,10 +18,10 @@ ruby ktsh.rb [options] <video_file>
 
 ```bash
 # Basic usage - creates 8x6 grid
-ruby ktsh.rb video.mp4
+ktsh video.mp4
 
 # Create 4x4 grid with smaller thumbnails
-ruby ktsh.rb -h 4 -v 4 -w 1280 video.mp4
+ktsh -h 4 -v 4 -w 1280 video.mp4
 ```
 
 ## License

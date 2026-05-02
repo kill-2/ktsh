@@ -1,0 +1,34 @@
+require 'optparse'
+require 'find'
+require 'ktsh'
+
+options = {}
+OptionParser.new do |opts|
+  opts.banner = "Usage: ktsh [options] <video-or-dir>"
+  opts.on('-h', '--horizontal NUM', Integer)
+  opts.on('-v', '--vertical NUM', Integer)
+  opts.on('-w', '--width NUM', Integer)
+end.parse!(into: options)
+
+input = ARGV[0]
+abort("Error: video file or directory required") unless input
+
+videos =
+  if File.directory?(input)
+    video_exts = %w[
+      mp4 mkv avi mov wmv flv webm mpeg mpg m4v 3gp 3g2
+      rm rmvb m2ts ts vob ogv divx xvid asf f4v m2v
+    ]
+    Enumerator.new do |e|
+      Find.find(input) do |path|
+        next unless File.file?(path)
+        next unless video_exts.include?(File.extname(path).downcase.delete_prefix('.'))
+
+        e << path
+      end
+    end
+  else
+    [input]
+  end
+
+videos.each{|v| Ktsh.create(v, **options) }

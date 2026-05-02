@@ -1,8 +1,11 @@
+# frozen_string_literal: true
+
+require_relative "ktsh/version"
+
 require 'json'
 require 'tmpdir'
 require 'securerandom'
 require 'fileutils'
-require 'optparse'
 
 module Ktsh
   class Meta
@@ -83,16 +86,3 @@ module Ktsh
     end
   end
 end
-
-options = {}
-OptionParser.new do |opts|
-  opts.banner = "Usage: ktsh.rb [options] <video>"
-  opts.on('-h', '--horizontal NUM', Integer)
-  opts.on('-v', '--vertical NUM', Integer)
-  opts.on('-w', '--width NUM', Integer)
-end.parse!(into: options)
-
-video = ARGV[0]
-abort("Error: video file required") unless video
-
-Ktsh.create(video, **options)
