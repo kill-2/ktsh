@@ -78,7 +78,7 @@ module Ktsh
 
       sample_width = (width - ((horizontal - 1) * padding) - 4) / horizontal
       meta = Meta.new(video, horizontal * vertical, sample_width)
-      command = %Q{ffmpeg -pattern_type glob -i "#{meta.tmpdir}/*.jpg" -filter_complex "tile=#{horizontal}x#{vertical}:padding=#{padding}:color=white,pad=iw+4:ih+102:2:100:white,drawtext=textfile='#{meta.info_file}':fontsize=18:fontcolor=black:x=2:y=2,format=yuv420p" -q:v 2 "#{video}.jpg" 2>/dev/null}
+      command = %Q{ffmpeg -pattern_type glob -i "#{meta.tmpdir}/*.jpg" -filter_complex "tile=#{horizontal}x#{vertical}:padding=#{padding}:color=white,pad=iw+4:ih+102:2:100:white,drawtext=textfile='#{meta.info_file}':fontfile=/System/Library/Fonts/Hiragino Sans GB.ttc:fontsize=16:fontcolor=black:x=2:y=2,format=yuv420p" -q:v 2 -y "#{video}.jpg" 2>/dev/null}
       system(command)
 
       lock.synchronize{stop = true}
